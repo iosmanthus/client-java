@@ -1,7 +1,11 @@
 name: Spotbugs
 on: 
-  - push
-  - pull_request_target
+  push:
+    branches:
+      - master 
+  pull_request_target:
+    branches:
+      - "*"
 
 jobs:
   build:
