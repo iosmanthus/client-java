@@ -47,7 +47,8 @@ public class PDClientMockTest extends PDMockServerTest {
   @Test
   public void testCreate() throws Exception {
     try (PDClient client = session.getPDClient()) {
-      assertEquals(LOCAL_ADDR + ":" + leader.port, client.getPdClientWrapper().getLeaderInfo());
+      assertEquals(LOCAL_ADDR + ":" + leader.getPort(),
+          client.getPdClientWrapper().getLeaderInfo());
       assertEquals(CLUSTER_ID, client.getHeader().getClusterId());
     }
   }
@@ -55,17 +56,18 @@ public class PDClientMockTest extends PDMockServerTest {
   @Test
   public void testSwitchLeader() throws Exception {
     try (PDClient client = session.getPDClient()) {
-      client.trySwitchLeader(HTTP + LOCAL_ADDR + ":" + (leader.port + 1));
+      client.trySwitchLeader(HTTP + LOCAL_ADDR + ":" + (leader.getPort() + 1));
       assertEquals(
-          client.getPdClientWrapper().getLeaderInfo(), HTTP + LOCAL_ADDR + ":" + (leader.port + 1));
+          client.getPdClientWrapper().getLeaderInfo(),
+          HTTP + LOCAL_ADDR + ":" + (leader.getPort() + 1));
     }
     tearDown();
     setup(LOCAL_ADDR_IPV6);
     try (PDClient client = session.getPDClient()) {
-      client.trySwitchLeader(HTTP + LOCAL_ADDR_IPV6 + ":" + (leader.port + 2));
+      client.trySwitchLeader(HTTP + LOCAL_ADDR_IPV6 + ":" + (leader.getPort() + 2));
       assertEquals(
           client.getPdClientWrapper().getLeaderInfo(),
-          HTTP + LOCAL_ADDR_IPV6 + ":" + (leader.port + 2));
+          HTTP + LOCAL_ADDR_IPV6 + ":" + (leader.getPort() + 2));
     }
   }
 
@@ -80,8 +82,8 @@ public class PDClientMockTest extends PDMockServerTest {
 
   @Test
   public void testGetRegionByKey() throws Exception {
-    byte[] startKey = new byte[] {1, 0, 2, 4};
-    byte[] endKey = new byte[] {1, 0, 2, 5};
+    byte[] startKey = new byte[]{1, 0, 2, 4};
+    byte[] endKey = new byte[]{1, 0, 2, 5};
     int confVer = 1026;
     int ver = 1027;
     leader.addGetRegionListener(
@@ -111,8 +113,8 @@ public class PDClientMockTest extends PDMockServerTest {
 
   @Test
   public void testGetRegionById() throws Exception {
-    byte[] startKey = new byte[] {1, 0, 2, 4};
-    byte[] endKey = new byte[] {1, 0, 2, 5};
+    byte[] startKey = new byte[]{1, 0, 2, 4};
+    byte[] endKey = new byte[]{1, 0, 2, 5};
     int confVer = 1026;
     int ver = 1027;
 

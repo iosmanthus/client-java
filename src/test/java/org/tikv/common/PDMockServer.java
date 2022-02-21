@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Optional;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tikv.kvproto.PDGrpc;
 import org.tikv.kvproto.Pdpb.GetMembersRequest;
 import org.tikv.kvproto.Pdpb.GetMembersResponse;
@@ -38,7 +40,8 @@ import org.tikv.kvproto.Pdpb.TsoResponse;
 
 public class PDMockServer extends PDGrpc.PDImplBase {
 
-  public int port;
+  private static final Logger logger = LoggerFactory.getLogger(PDMockServer.class);
+  private int port;
   private long clusterId;
   private Server server;
 
@@ -47,6 +50,10 @@ public class PDMockServer extends PDGrpc.PDImplBase {
   private Function<GetRegionRequest, GetRegionResponse> getRegionListener;
   private Function<GetRegionByIDRequest, GetRegionResponse> getRegionByIDListener;
 
+  public int getPort() {
+    return port;
+  }
+
   public void addGetMembersListener(Function<GetMembersRequest, GetMembersResponse> func) {
     getMembersListener = func;
   }
@@ -54,7 +61,7 @@ public class PDMockServer extends PDGrpc.PDImplBase {
   @Override
   public void getMembers(GetMembersRequest request, StreamObserver<GetMembersResponse> resp) {
     try {
-      resp.onNext(Optional.ofNullable(getMembersListener.apply(request)).get());
+      resp.onNext(getMembersListener.apply(request));
       resp.onCompleted();
     } catch (Exception e) {
       resp.onError(Status.INTERNAL.asRuntimeException());
@@ -68,10 +75,12 @@ public class PDMockServer extends PDGrpc.PDImplBase {
       private int logical = 0;
 
       @Override
-      public void onNext(TsoRequest value) {}
+      public void onNext(TsoRequest value) {
+      }
 
       @Override
-      public void onError(Throwable t) {}
+      public void onError(Throwable t) {
+      }
 
       @Override
       public void onCompleted() {
@@ -119,6 +128,7 @@ public class PDMockServer extends PDGrpc.PDImplBase {
       resp.onNext(Optional.ofNullable(getStoreListener.apply(request)).get());
       resp.onCompleted();
     } catch (Exception e) {
+      logger.error("getStore error {} on {}", e.getMessage(), getPort());
       resp.onError(Status.INTERNAL.asRuntimeException());
     }
   }
