@@ -110,8 +110,8 @@ public class RegionCache {
   public synchronized void invalidateRegion(TiRegion region) {
     try {
       if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[begin] invalidateRegion ID[%s] Region[%s]", region.getId()),
-            region);
+        logger.debug(
+            String.format("[begin] invalidateRegion ID[%s] Region[%s]", region.getId(), region));
       }
       TiRegion oldRegion = regionCache.get(region.getId());
       if (oldRegion != null && oldRegion == region) {
@@ -128,18 +128,20 @@ public class RegionCache {
 
   public synchronized void insertRegionToCache(TiRegion region) {
     try {
-      logger.debug(String.format("[begin] insertRegionToCache ID[%s] Region[%s]", region.getId()),
-          region);
+      logger.debug(
+          String.format("[begin] insertRegionToCache ID[%s] Region[%s]", region.getId(), region));
       TiRegion oldRegion = regionCache.get(region.getId());
       if (oldRegion != null) {
-        logger.debug(String.format("insertRegionToCache ID[%s] Region[%s] already exists",
-            oldRegion.getId(), oldRegion));
+        logger.debug(
+            String.format(
+                "insertRegionToCache ID[%s] Region[%s] already exists",
+                oldRegion.getId(), oldRegion));
         keyToRegionIdCache.remove(makeRange(oldRegion.getStartKey(), oldRegion.getEndKey()));
       }
       regionCache.put(region.getId(), region);
       keyToRegionIdCache.put(makeRange(region.getStartKey(), region.getEndKey()), region.getId());
-      logger.debug(String.format("[finish] insertRegionToCache ID[%s] Region[%s]", region.getId()),
-          region);
+      logger.debug(
+          String.format("[finish] insertRegionToCache ID[%s] Region[%s]", region.getId(), region));
     } catch (Exception e) {
       logger.warn("insertRegionToCache failed", e);
     }
@@ -155,8 +157,10 @@ public class RegionCache {
         return false;
       } else {
         if (oldRegion != null) {
-          logger.debug(String.format("[update] invalidateRegion ID[%s] Region[%s] already exists",
-              oldRegion.getId(), oldRegion));
+          logger.debug(
+              String.format(
+                  "[update] invalidateRegion ID[%s] Region[%s] already exists",
+                  oldRegion.getId(), oldRegion));
           keyToRegionIdCache.remove(makeRange(oldRegion.getStartKey(), oldRegion.getEndKey()));
         }
         regionCache.put(region.getId(), region);
