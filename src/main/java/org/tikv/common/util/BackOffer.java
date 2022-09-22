@@ -23,9 +23,9 @@ public interface BackOffer {
   // Back off types.
   int seconds = 1000;
   int TSO_MAX_BACKOFF = 5 * seconds;
-  int SCANNER_NEXT_MAX_BACKOFF = 40 * seconds;
+  int SCANNER_NEXT_MAX_BACKOFF = 400 * seconds;
   int BATCH_GET_MAX_BACKOFF = 40 * seconds;
-  int COP_NEXT_MAX_BACKOFF = 40 * seconds;
+  int COP_NEXT_MAX_BACKOFF = 400 * seconds;
   int GET_MAX_BACKOFF = 40 * seconds;
   int RAWKV_MAX_BACKOFF = 20 * seconds;
   int PD_INFO_BACKOFF = 5 * seconds;

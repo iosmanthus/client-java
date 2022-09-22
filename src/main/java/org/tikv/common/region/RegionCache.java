@@ -82,6 +82,7 @@ public class RegionCache {
     TiRegion oldRegion = regionCache.get(region.getId());
     if (oldRegion != null) {
       if (oldRegion.getMeta().equals(region.getMeta())) {
+        logger.debug("putRegion: region meta is the same, skip update");
         return oldRegion;
       } else {
         invalidateRegion(oldRegion);
@@ -109,26 +110,38 @@ public class RegionCache {
   public synchronized void invalidateRegion(TiRegion region) {
     try {
       if (logger.isDebugEnabled()) {
-        logger.debug(String.format("invalidateRegion ID[%s]", region.getId()));
+        logger.debug(String.format("[begin] invalidateRegion ID[%s] Region[%s]", region.getId()),
+            region);
       }
       TiRegion oldRegion = regionCache.get(region.getId());
       if (oldRegion != null && oldRegion == region) {
         keyToRegionIdCache.remove(makeRange(region.getStartKey(), region.getEndKey()));
         regionCache.remove(region.getId());
+        if (logger.isDebugEnabled()) {
+          logger.debug(String.format("[end] invalidateRegion ID[%s]", region.getId()));
+        }
       }
-    } catch (Exception ignore) {
+    } catch (Exception e) {
+      logger.warn("invalidateRegion failed", e);
     }
   }
 
   public synchronized void insertRegionToCache(TiRegion region) {
     try {
+      logger.debug(String.format("[begin] insertRegionToCache ID[%s] Region[%s]", region.getId()),
+          region);
       TiRegion oldRegion = regionCache.get(region.getId());
       if (oldRegion != null) {
+        logger.debug(String.format("insertRegionToCache ID[%s] Region[%s] already exists",
+            oldRegion.getId(), oldRegion));
         keyToRegionIdCache.remove(makeRange(oldRegion.getStartKey(), oldRegion.getEndKey()));
       }
       regionCache.put(region.getId(), region);
       keyToRegionIdCache.put(makeRange(region.getStartKey(), region.getEndKey()), region.getId());
-    } catch (Exception ignore) {
+      logger.debug(String.format("[finish] insertRegionToCache ID[%s] Region[%s]", region.getId()),
+          region);
+    } catch (Exception e) {
+      logger.warn("insertRegionToCache failed", e);
     }
   }
 
@@ -142,13 +155,16 @@ public class RegionCache {
         return false;
       } else {
         if (oldRegion != null) {
+          logger.debug(String.format("[update] invalidateRegion ID[%s] Region[%s] already exists",
+              oldRegion.getId(), oldRegion));
           keyToRegionIdCache.remove(makeRange(oldRegion.getStartKey(), oldRegion.getEndKey()));
         }
         regionCache.put(region.getId(), region);
         keyToRegionIdCache.put(makeRange(region.getStartKey(), region.getEndKey()), region.getId());
         return true;
       }
-    } catch (Exception ignore) {
+    } catch (Exception e) {
+      logger.debug("updateRegion failed", e);
       return false;
     }
   }
@@ -194,6 +210,7 @@ public class RegionCache {
   }
 
   public synchronized void invalidateStore(long storeId) {
+    logger.debug(String.format("invalidateStore ID[%s]", storeId));
     TiStore store = storeCache.remove(storeId);
     if (store != null) {
       store.markInvalid();
